@@ -171,3 +171,17 @@ dist
 
 # codeceptJS
 /output/
+
+# Go build and test artifacts
+/bin/
+*.exe
+*.test
+*.test.exe
+*.out
+*.prof
+coverage.txt
+coverage.html
+__debug_bin*
+
+# Local Go module metadata (file-based exercises)
+go.mod

@@ -1,3 +1,5 @@
+package solution
+
 func mergeAlternately(word1 string, word2 string) string {
 	n1, n2 := len(word1), len(word2)
 	str := make([]byte, 0, n1+n2)
