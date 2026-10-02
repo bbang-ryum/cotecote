@@ -1,0 +1,1240 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>238 · 자기 자신을 제외한 곱</title>
+<style>:root {
+  color-scheme: light dark;
+  background-color: var(
+    --background,
+    var(--color-background-primary, light-dark(rgb(255 255 255), rgb(24 24 24)))
+  ) !important;
+
+  /* Agent-facing contract; keep in sync with SKILL.md. */
+  --background: var(
+    --color-background-primary,
+    light-dark(rgb(255 255 255), rgb(24 24 24))
+  );
+  --foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --card: color-mix(in oklab, var(--foreground) 5%, var(--background));
+  --card-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --popover: var(
+    --color-background-secondary,
+    light-dark(rgb(255 255 255), rgb(45 45 45))
+  );
+  --popover-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --primary: var(
+    --color-text-info,
+    light-dark(rgb(51 156 255), rgb(131 195 255))
+  );
+  --primary-foreground: var(
+    --color-text-inverse,
+    light-dark(rgb(255 255 255), rgb(13 13 13))
+  );
+  --secondary: var(
+    --color-background-secondary,
+    light-dark(rgb(255 255 255 / 96%), rgb(54 54 54 / 96%))
+  );
+  --secondary-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --muted: color-mix(in srgb, var(--foreground) 10%, transparent);
+  --muted-foreground: var(
+    --color-text-secondary,
+    light-dark(rgb(26 28 31 / 49.4%), rgb(255 255 255 / 49.8%))
+  );
+  --accent: var(
+    --color-background-info,
+    light-dark(rgb(229 242 255), rgb(13 39 63))
+  );
+  --accent-foreground: var(
+    --color-text-info,
+    light-dark(rgb(51 156 255), rgb(131 195 255))
+  );
+  --destructive: var(
+    --color-text-warning,
+    light-dark(rgb(226 85 7), rgb(255 133 73))
+  );
+  --border: var(
+    --color-border-secondary,
+    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
+  );
+  --input: var(
+    --color-border-primary,
+    light-dark(
+      rgb(26 28 31 / 11.8%),
+      color-mix(in oklab, rgb(0 0 0) 10%, transparent)
+    )
+  );
+  --ring: var(
+    --color-ring-primary,
+    light-dark(rgb(51 156 255), rgb(131 195 255 / 76%))
+  );
+  --font-size-base: var(--font-text-md-size, 14px);
+  --blue: light-dark(rgb(51 156 255), rgb(51 156 255));
+  --orange: light-dark(rgb(226 85 7), rgb(251 106 34));
+  --green: light-dark(rgb(0 162 64), rgb(64 201 119));
+  --red: light-dark(rgb(224 46 42), rgb(255 103 100));
+  --purple: light-dark(rgb(146 79 247), rgb(173 123 249));
+  --yellow: light-dark(rgb(255 195 0), rgb(255 210 64));
+  --viz-series-1: var(--primary);
+  --viz-series-2: light-dark(rgb(243 136 59), rgb(245 154 86));
+  --viz-series-3: light-dark(rgb(93 201 119), rgb(116 213 139));
+  --viz-series-4: light-dark(rgb(235 119 177), rgb(240 143 192));
+  --viz-series-5: light-dark(rgb(155 121 236), rgb(170 145 239));
+  --viz-series-6: light-dark(rgb(58 185 177), rgb(90 203 194));
+
+  /* Internal implementation variables; not part of the agent contract. */
+  --font-sans: -apple-system, system-ui, "Segoe UI", sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
+    monospace;
+  --font-size-normal: max(11px, var(--font-size-base));
+  --font-size-tooltip: calc(var(--font-size-base) - 1px);
+  --font-size-small: max(11px, calc(var(--font-size-base) - 2px));
+  --font-size-h1: calc(var(--font-size-normal) * 1.7142857143);
+  --font-size-h2: calc(var(--font-size-normal) * 1.4285714286);
+  --font-size-h3: calc(var(--font-size-normal) * 1.2857142857);
+  --font-weight-normal: 430;
+  --font-weight-medium: 500;
+  --icon-size: 16px;
+  --line-height-normal: calc(var(--font-size-normal) * 1.5);
+  --line-height-tooltip: calc(var(--font-size-tooltip) * 1.4285714286);
+  --line-height-small: calc(var(--font-size-small) + 4px);
+  --corner-shape: round;
+  --radius: var(--border-radius-lg, 10px);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-2xl: calc(var(--radius) * 1.6);
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px -1px rgb(0 0 0 / 8%);
+  --checkmark-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 17 17'%3E%3Cpath d='M12.8961 3.64101C13.1297 3.41418 13.4984 3.37523 13.7779 3.56581C14.0571 3.75635 14.1554 4.11331 14.0299 4.41347L13.9615 4.53847L7.71151 13.7045C7.59411 13.8767 7.4063 13.9877 7.19881 14.0072C6.99136 14.0267 6.78564 13.9533 6.63826 13.806L2.88826 10.056L2.79842 9.9457C2.6192 9.67407 2.64927 9.30496 2.88826 9.06581C3.12738 8.82669 3.49647 8.79676 3.76815 8.97597L3.8785 9.06581L7.03084 12.2182L12.8053 3.74941L12.8961 3.64101Z'/%3E%3C/svg%3E");
+
+  /* Legacy aliases; not part of the current agent contract. */
+  --viz-bg: transparent;
+  --viz-panel: var(--card);
+  --viz-border: var(--border);
+  --viz-text: var(--foreground);
+  --viz-muted: var(--muted-foreground);
+  --viz-accent: var(--primary);
+  --viz-accent-text: var(--primary-foreground);
+  --viz-accent-bg: var(--accent);
+  --viz-font-size: var(--font-size-base);
+  --viz-warning: var(--destructive);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html > body {
+  /* Preserve MCP aliases for older inline renderers without creating :root cycles. */
+  --color-background-primary: var(
+    --background,
+    light-dark(rgb(255 255 255), rgb(24 24 24))
+  );
+  --color-text-primary: var(
+    --foreground,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --color-border-secondary: var(
+    --border,
+    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
+  );
+
+  margin: 0;
+  padding: var(--visualize-paint-gutter, 0px);
+  color: var(--foreground);
+  background: transparent !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--font-size-normal);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+}
+
+a {
+  color: color-mix(in srgb, var(--viz-accent) 80%, var(--viz-text) 20%);
+  cursor: pointer;
+  font-weight: var(--font-weight-medium, 500);
+  text-decoration: none;
+  text-underline-offset: 2px;
+}
+
+a:is(:hover, :focus-visible) {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-thickness: 0.5px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-block: 0;
+}
+
+h1 {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+h3,
+h4,
+h5,
+h6 {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.3;
+}
+
+b,
+strong,
+th {
+  font-weight: var(--font-weight-medium);
+}
+
+code:not(pre code) {
+  display: inline;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  corner-shape: var(--corner-shape);
+  background: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  word-break: break-word;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--foreground);
+  font: inherit;
+  text-align: start;
+}
+
+.table :is(th, td) {
+  padding-block: 10px;
+  padding-inline: 0 24px;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--border);
+  text-align: start;
+  vertical-align: top;
+}
+
+.table-responsive > .table :is(th, td) {
+  overflow-wrap: break-word;
+}
+
+.table :is(th, td):last-child {
+  padding-inline-end: 0;
+}
+
+.table :is(caption, thead th) {
+  font-weight: 600;
+}
+
+.table thead th {
+  padding-block: 8px;
+  border-bottom-color: color-mix(in srgb, var(--foreground) 16%, transparent);
+}
+
+.table tbody tr:last-child :is(th, td) {
+  border-bottom: 0;
+}
+
+.table.table-sm :is(th, td) {
+  padding-block: 6px;
+}
+
+.table.table-sm :is(th, td):not(:last-child) {
+  padding-inline-end: 16px;
+}
+
+.table :is(.text-end, [align="right"]) {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.table :is(.text-center, [align="center"]) {
+  text-align: center;
+}
+
+.table .text-nowrap {
+  white-space: nowrap;
+}
+
+#widget {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  background: transparent !important;
+}
+
+.card {
+  min-width: 0;
+  padding: 12px;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  border-radius: var(--radius-2xl);
+  corner-shape: var(--corner-shape);
+  color: var(--card-foreground);
+  background: var(--card);
+}
+
+#widget > :not(.card, .progress) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.tooltip {
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  left: 0;
+  width: max-content;
+  max-width: min(
+    20rem,
+    var(--tooltip-available-width, calc(100vw - 10px)),
+    calc(100vw - 10px)
+  );
+  max-height: min(
+    var(--tooltip-available-height, calc(100vh - 10px)),
+    calc(100vh - 10px)
+  );
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  corner-shape: var(--corner-shape);
+  color: var(--popover-foreground);
+  background: var(--popover);
+  box-shadow: none;
+  font-size: var(--font-size-tooltip);
+  line-height: var(--line-height-tooltip);
+  overflow-wrap: break-word;
+  white-space: normal;
+  pointer-events: none;
+  user-select: none;
+}
+
+.viz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(max(180px, 24%), 1fr));
+  gap: 10px;
+}
+
+.viz-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.viz-stat-value {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+.viz-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+hr {
+  width: 100%;
+  height: 1px;
+  margin-block: 6px;
+  border: 0;
+  background: var(--border);
+}
+
+.nav {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 4px;
+}
+
+.progress {
+  display: flex;
+  height: 8px;
+  margin-block: calc((var(--line-height-normal, 1.5em) - 8px) / 2);
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+}
+
+.progress-bar:only-child {
+  border-radius: var(--radius-full);
+}
+
+.progress-bar {
+  height: 100%;
+  flex-shrink: 0;
+  border: 0;
+  background: var(--viz-series-1);
+}
+
+.viz-badge {
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  color: var(--accent-foreground);
+  background: var(--accent);
+  font-weight: var(--font-weight-medium);
+}
+
+small,
+.text-small,
+.viz-badge {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.text-muted {
+  color: var(--muted-foreground);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.viz-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.viz-controls > .form-label {
+  display: grid;
+  min-width: min(100%, 260px);
+  flex: 1 1 280px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px 12px;
+  margin-bottom: 0;
+}
+
+.viz-controls > .form-label > :is(.form-control, .form-range, .form-select) {
+  grid-column: 1 / -1;
+}
+
+.btn,
+.nav-link,
+.form-check-input,
+.form-control,
+.form-range,
+.form-select {
+  font: inherit;
+}
+
+.btn,
+.nav-link {
+  appearance: button;
+  display: inline-flex;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0 8px;
+  -webkit-app-region: no-drag;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-lg);
+  corner-shape: var(--corner-shape);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+  cursor: var(--cursor-interaction, pointer);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.btn:is(.btn-block, .viz-tile) {
+  inline-size: 100%;
+}
+
+.btn.viz-tile {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+a.btn {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn:not(:disabled):hover,
+.nav-link:not(:disabled):not([aria-disabled="true"]):hover {
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.btn-primary {
+  border-color: transparent;
+  color: var(--primary-foreground);
+  background: var(--foreground);
+  background-clip: padding-box;
+}
+
+.btn-primary .text-muted {
+  color: color-mix(in srgb, var(--primary-foreground) 50%, transparent);
+}
+
+.btn-primary:not(:disabled):hover {
+  background: color-mix(in srgb, var(--foreground) 80%, transparent);
+  background-clip: padding-box;
+}
+
+.btn-ghost {
+  border-color: transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.btn-ghost:not(:disabled):hover {
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.nav-pills .nav-link {
+  min-width: 0;
+  border-color: transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.nav-justified .nav-link {
+  flex: 1 1 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.nav-pills .nav-link.active {
+  color: var(--foreground);
+  background: var(--muted);
+}
+
+.btn:disabled,
+.nav-link:disabled,
+.nav-link[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+[data-lucide] {
+  stroke-width: 1.6;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--foreground);
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  min-height: 28px;
+  padding: 0 8px;
+  outline: none;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-lg);
+  corner-shape: var(--corner-shape);
+  color: var(--foreground);
+  background: var(--secondary);
+}
+
+.form-control::placeholder {
+  color: var(--muted-foreground);
+}
+
+.form-control[type="file"] {
+  padding: 0;
+  overflow: hidden;
+  cursor: var(--cursor-interaction, pointer);
+}
+
+.form-control[type="file"]::file-selector-button {
+  min-height: 26px;
+  margin-right: 8px;
+  padding: 0 8px;
+  border: 0;
+  border-right: 1px solid var(--input);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+  cursor: inherit;
+  font: inherit;
+}
+
+.form-control[type="file"]:not(:disabled):hover::file-selector-button {
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.form-control-color[type="color"] {
+  width: 40px;
+  height: 28px;
+  padding: 3px;
+  cursor: var(--cursor-interaction, pointer);
+}
+
+.form-control-color[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.form-control-color[type="color"]::-webkit-color-swatch {
+  border: 0;
+  border-radius: calc(var(--radius-lg) - 4px);
+  corner-shape: var(--corner-shape);
+}
+
+textarea.form-control {
+  height: auto;
+  min-height: 72px;
+  padding: 8px 10px;
+  resize: vertical;
+}
+
+.form-control:focus-visible {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.form-select {
+  appearance: none;
+  display: block;
+  width: 100%;
+  min-height: 28px;
+  margin: 0;
+  padding: 0 32px 0 8px;
+  outline: none;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-lg);
+  corner-shape: var(--corner-shape);
+  color: var(--foreground);
+  background-color: var(--secondary);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted-foreground) 50%),
+    linear-gradient(135deg, var(--muted-foreground) 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) 50%,
+    calc(100% - 10px) 50%;
+  background-repeat: no-repeat;
+  background-size: 4px 4px;
+  cursor: var(--cursor-interaction, default);
+}
+
+.form-select:not(:disabled):hover {
+  background-color: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.form-select:focus-visible {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-check {
+  display: flex;
+  min-height: 20px;
+  align-items: center;
+  gap: 6px;
+}
+
+.form-check-input {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  margin: 0;
+  border: 1px solid var(--input);
+  color: var(--primary-foreground);
+  background-color: transparent;
+  cursor: var(--cursor-interaction, default);
+  transition:
+    background-color 150ms,
+    border-color 150ms,
+    box-shadow 150ms;
+}
+
+.form-check:not(.form-switch) .form-check-input[type="checkbox"] {
+  border-color: var(--input);
+  border-radius: var(--radius-sm);
+  corner-shape: var(--corner-shape);
+  background-color: var(--secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input:not(:disabled):not(:checked):hover {
+  background-color: var(--card);
+}
+
+.form-check:not(.form-switch) .form-check-input[type="checkbox"]:checked {
+  border-color: var(--primary);
+  background-color: var(--primary);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input[type="checkbox"]:checked::before {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-foreground);
+  content: "";
+  mask: var(--checkmark-image) center / 12px 12px no-repeat;
+}
+
+.form-check-input[type="radio"] {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-full);
+}
+
+.form-check-input[type="radio"]:checked {
+  border: 2px solid var(--primary);
+  background:
+    radial-gradient(circle, var(--primary-foreground) 0 2.5px, transparent 3px),
+    var(--primary);
+}
+
+.form-check:not(.form-switch) .form-check-input:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+}
+
+.form-switch .form-check-input:disabled,
+.form-switch .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-check-label {
+  color: var(--foreground);
+  cursor: var(--cursor-interaction, default);
+}
+
+.form-switch .form-check-input {
+  position: relative;
+  width: 32px;
+  height: 20px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  box-shadow: none;
+  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.form-switch .form-check-input::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 1px solid light-dark(var(--primary-foreground), var(--foreground));
+  border-radius: var(--radius-full);
+  background: light-dark(var(--primary-foreground), var(--foreground));
+  box-shadow: var(--shadow-sm);
+  content: "";
+  transform: translate(2px, -50%);
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.form-switch .form-check-input:checked {
+  background: var(--primary);
+}
+
+.form-switch .form-check-input:checked::before {
+  transform: translate(14px, -50%);
+}
+
+.form-switch .form-check-input:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.form-range {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 28px;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  border: 0;
+  accent-color: var(--primary);
+  background: linear-gradient(
+      color-mix(in srgb, var(--foreground) 7%, transparent),
+      color-mix(in srgb, var(--foreground) 7%, transparent)
+    )
+    center / 100% 2px no-repeat;
+}
+
+.form-range::-webkit-slider-runnable-track {
+  height: 28px;
+  background: transparent;
+}
+
+.form-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: light-dark(var(--primary-foreground), var(--foreground));
+}
+
+.form-range:focus-visible::-webkit-slider-thumb {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-range::-moz-range-track {
+  height: 28px;
+  background: transparent;
+}
+
+.form-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: light-dark(var(--primary-foreground), var(--foreground));
+}
+
+.form-range:focus-visible::-moz-range-thumb {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-range:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.btn:not(.btn-primary, .viz-tile):is(
+  [aria-pressed="true"],
+  [aria-selected="true"],
+  .is-selected
+) {
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+
+.btn.viz-tile:is([aria-pressed="true"], [aria-selected="true"], .is-selected) {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.btn:focus-visible,
+.nav-link:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+@media (pointer: coarse) {
+  .btn,
+  .nav-link,
+  .form-control,
+  .form-select {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Keep small-screen WebKit from zooming when a text field receives focus. */
+  .form-control,
+  .form-select {
+    font-size: max(16px, var(--font-size-normal));
+  }
+
+  .form-control[type="file"]::file-selector-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .form-control-color[type="color"] {
+    width: 44px;
+    height: 44px;
+  }
+
+  .form-control:is(
+    [type="date"],
+    [type="datetime-local"],
+    [type="month"],
+    [type="time"],
+    [type="week"]
+  ) {
+    min-width: 0;
+    max-width: 100%;
+    padding-block: 8px;
+  }
+
+  .form-check {
+    min-height: 44px;
+    padding-inline: 15px;
+  }
+
+  .form-check-input {
+    position: relative;
+  }
+
+  .form-check-input::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    content: "";
+    transform: translate(-50%, -50%);
+  }
+
+  .form-check-label {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .form-range {
+    height: 44px;
+    touch-action: pan-y;
+  }
+
+  .form-range::-webkit-slider-runnable-track {
+    height: 44px;
+  }
+
+  .form-range::-moz-range-track {
+    height: 44px;
+  }
+
+  .form-range::-webkit-slider-thumb {
+    margin-top: 12px;
+  }
+}
+
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+#widget > svg {
+  width: 100%;
+}
+
+/* Model-authored chart rules can otherwise stretch icons after these styles load. */
+svg.lucide {
+  display: block;
+  width: var(--icon-size) !important;
+  height: var(--icon-size) !important;
+  flex: none;
+  margin: 0 !important;
+  stroke-width: 1.6;
+}
+
+.text-warning,
+.text-destructive {
+  color: var(--destructive);
+}
+
+html > body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+}
+#product-walk { width: 100%; max-width: 900px; margin: auto; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div id="product-walk">
+  <div class="viz-controls">
+    <label class="form-label">nums (2~6개, -9~9)
+      <input class="form-control" id="pw-input" value="1, 2, 3, 4" aria-label="쉼표로 구분한 정수 배열">
+    </label>
+    <button class="btn" id="pw-apply" type="button">입력 적용</button>
+  </div>
+  <div id="pw-error" role="alert" class="text-destructive" hidden></div>
+  <div class="viz-controls">
+    <button class="btn" id="pw-back" type="button">이전 한 줄</button>
+    <button class="btn btn-primary" id="pw-next" type="button">다음 한 줄</button>
+    <button class="btn" id="pw-play" type="button">자동 재생</button>
+    <span id="pw-progress" class="text-small tabular-nums"></span>
+  </div>
+  <div class="viz-row pw-status tabular-nums">
+    <span id="pw-phase"></span>
+  </div>
+  <div class="pw-variables tabular-nums" aria-label="변수 변화" aria-live="polite">
+    <div class="card pw-variable" id="pw-var-i"><div><code>i</code> · 현재 인덱스</div><div class="pw-value" id="pw-value-i">—</div><div class="pw-change" id="pw-change-i">아직 시작 전</div></div>
+    <div class="card pw-variable" id="pw-var-m"><div><code>m</code> · 왼쪽 누적 곱</div><div class="pw-value" id="pw-value-m">—</div><div class="pw-change" id="pw-change-m">아직 시작 전</div></div>
+    <div class="card pw-variable" id="pw-var-r"><div><code>r</code> · 오른쪽 누적 곱</div><div class="pw-value" id="pw-value-r">—</div><div class="pw-change" id="pw-change-r">아직 시작 전</div></div>
+  </div>
+  <div id="pw-arrays" role="group" aria-label="현재 인덱스와 nums, temp의 변화">
+    <div class="pw-row"><span class="text-small">인덱스</span><div id="pw-indices" class="pw-cells"></div></div>
+    <div class="pw-row"><code>nums</code><div id="pw-nums" class="pw-cells"></div></div>
+    <div class="pw-row"><code>temp</code><div id="pw-temp" class="pw-cells"></div></div>
+    <div class="pw-row"><span></span><div class="pw-track"><span id="pw-pointer">↑ 현재 i</span></div></div>
+  </div>
+  <div id="pw-temp-meaning" aria-live="polite"></div>
+  <div class="viz-row text-small pw-legend">
+    <span><i class="pw-key pw-left"></i>왼쪽 숫자</span>
+    <span><i class="pw-key pw-right"></i>오른쪽 숫자</span>
+    <span>— : 아직 저장 전</span>
+  </div>
+  <div id="pw-detail" aria-live="polite" class="tabular-nums"></div>
+  <pre class="pw-code" aria-label="Go 코드와 방금 실행한 줄"><code id="pw-code"></code></pre>
+</div>
+<style>
+#product-walk {color:var(--foreground);display:grid;gap:16px;}
+#product-walk .pw-status {justify-content:space-between;}
+#product-walk .pw-variables {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+#product-walk .pw-variable {min-width:0;padding:16px;transition:background .2s;}
+#product-walk .pw-value {font-size:32px;font-weight:500;line-height:1.3;margin:8px 0;overflow-wrap:anywhere;}
+#product-walk .pw-change {min-height:42px;overflow-wrap:anywhere;}
+#product-walk .pw-variable.pw-updated {background:var(--accent);color:var(--accent-foreground);outline:2px solid var(--foreground);outline-offset:-2px;}
+@media(max-width:480px){#product-walk .pw-variables {grid-template-columns:1fr;}#product-walk .pw-variable {display:grid;grid-template-columns:1fr auto;gap:4px 12px;}#product-walk .pw-value {margin:0;}#product-walk .pw-change {grid-column:1 / -1;min-height:0;}}
+#product-walk .pw-row {display:grid;grid-template-columns:56px minmax(0,1fr);gap:8px;align-items:center;margin-bottom:8px;}
+#product-walk .pw-cells {display:grid;grid-template-columns:repeat(var(--pw-n,4),minmax(0,1fr));gap:6px;}
+#product-walk .pw-cell {text-align:center;padding:12px 0;min-width:0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums;background:var(--muted);color:var(--foreground);}
+#product-walk .pw-index {text-align:center;}
+#product-walk .pw-temp-label {display:block;margin-top:6px;overflow-wrap:normal;word-break:keep-all;}
+#product-walk .pw-left {background:color-mix(in srgb,var(--viz-series-1) 20%,transparent);}
+#product-walk .pw-right {background:color-mix(in srgb,var(--viz-series-2) 20%,transparent);}
+#product-walk .pw-current {box-shadow:inset 0 -3px var(--foreground);}
+#product-walk .pw-answer {background:color-mix(in srgb,var(--viz-series-2) 14%,transparent);}
+#product-walk .pw-track {position:relative;height:26px;}
+#product-walk #pw-pointer {position:absolute;width:calc(100% / var(--pw-n,4));left:0;text-align:center;transition:left .4s ease;white-space:nowrap;}
+#product-walk .pw-key {display:inline-block;width:12px;height:12px;margin-right:5px;}
+#product-walk #pw-detail {min-height:48px;display:flex;align-items:center;overflow-wrap:anywhere;}
+#product-walk .pw-code {margin:0;white-space:pre-wrap;overflow-wrap:anywhere;}
+#product-walk .pw-line {display:block;padding:3px 6px;}
+#product-walk .pw-executed {background:var(--accent);color:var(--accent-foreground);box-shadow:inset 3px 0 var(--foreground);}
+@media(prefers-reduced-motion:reduce){#product-walk #pw-pointer {transition:none;}}
+</style>
+<script>
+(() => {
+  const root = document.getElementById('product-walk');
+  const get = id => root.querySelector('#pw-' + id);
+  const lines = [
+    'temp := []int{}',
+    'm := 1',
+    'for i := 0; i < len(nums); i++ {',
+    '    temp = append(temp, m)',
+    '    m = m * nums[i]',
+    '}',
+    'r := 1',
+    'for i := len(nums)-1; i >= 0; i-- {',
+    '    temp[i] = temp[i] * r',
+    '    r = r * nums[i]',
+    '}',
+    'return temp'
+  ];
+  lines.forEach(line => {
+    const el = document.createElement('span');
+    el.className = 'pw-line'; el.textContent = line;
+    get('code').appendChild(el);
+  });
+  let nums = [], states = [], position = 0, timer = null, displayed = null;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  function build(values) {
+    nums = values; states = []; position = 0; displayed = null;
+    let temp = [], m = null, r = null;
+    const save = (phase, i, line, detail, changed = -1, finished = false) =>
+      states.push({phase,i,line,detail,changed,finished,temp:[...temp],m,r});
+    save('준비',-1,0,'temp = []');
+    m = 1;
+    save('왼쪽 곱 →',-1,1,'m = 1 · 아직 곱한 숫자 없음');
+    for(let i=0;i<nums.length;i++) {
+      save('왼쪽 곱 →',i,2,`i = ${i} · 현재 숫자 ${nums[i]}`);
+      temp.push(m);
+      save('왼쪽 곱 →',i,3,`temp[${i}] ← ${m} · 현재 숫자 ${nums[i]}는 아직 제외`,i);
+      const before=m; m*=nums[i];
+      save('왼쪽 곱 →',i,4,`m: ${before} × ${nums[i]} = ${m} · 다음 자리용`);
+    }
+    r=1;
+    save('← 오른쪽 곱',-1,6,'r = 1 · 맨 끝의 오른쪽에는 숫자가 없음');
+    for(let i=nums.length-1;i>=0;i--) {
+      save('← 오른쪽 곱',i,7,`i = ${i} · 현재 숫자 ${nums[i]}`);
+      const left=temp[i]; temp[i]*=r;
+      save('← 오른쪽 곱',i,8,`temp[${i}]: 왼쪽 ${left} × 오른쪽 ${r} = ${temp[i]}`,i);
+      const before=r; r*=nums[i];
+      save('← 오른쪽 곱',i,9,`r: ${before} × ${nums[i]} = ${r} · ${i>0?'다음 i = '+(i-1)+' 자리용':'이후 사용하지 않음'}`);
+    }
+    save('완료',-1,11,`반환값: [${temp.join(', ')}]`,-1,true);
+    root.style.setProperty('--pw-n',nums.length);
+    ['indices','nums','temp'].forEach(id=>get(id).replaceChildren());
+    nums.forEach((v,i)=>{
+      ['indices','nums','temp'].forEach(id=>{
+        const el=document.createElement('div');
+        el.className=id==='indices'?'pw-index text-small':'pw-cell';
+        el.textContent=id==='indices'?i:id==='nums'?v:'—';
+        get(id).appendChild(el);
+      });
+    });
+    render(false);
+  }
+  function stop() {
+    if(timer!==null) clearInterval(timer);
+    timer=null; get('play').textContent='자동 재생';
+  }
+  function render(animate=true) {
+    const s=states[position];
+    get('phase').textContent=s.phase;
+    const format = (key, value) => value === null || (key === 'i' && value < 0) ? '—' : String(value);
+    ['i','m','r'].forEach(key => {
+      const value = format(key, s[key]);
+      const before = displayed ? format(key, displayed[key]) : value;
+      const changed = before !== value;
+      const assigned = (key === 'm' && [1,4].includes(s.line)) || (key === 'r' && [6,9].includes(s.line)) || (key === 'i' && [2,7].includes(s.line));
+      const card = get('var-' + key);
+      const number = get('value-' + key);
+      number.textContent = value;
+      card.classList.toggle('pw-updated', changed || assigned);
+      get('change-' + key).textContent = changed ? `${before} → ${value}` : assigned ? `${value} → ${value} · 값 유지` : value === '—' ? '현재 사용 안 함' : '변화 없음';
+      number.getAnimations().forEach(animation => animation.cancel());
+      if (animate && !reduced.matches && (changed || assigned))
+        number.animate([{transform:'translateY(-8px) scale(1.12)'},{transform:'translateY(0) scale(1)'}],{duration:550,easing:'ease-out'});
+    });
+    displayed = s;
+    get('detail').textContent=s.detail;
+    get('temp-meaning').textContent = s.finished
+      ? 'temp: 모든 칸이 나를 제외한 곱 · 최종 답'
+      : s.phase === '← 오른쪽 곱'
+        ? 'temp: 아직 처리 전 = 왼쪽 곱 · 처리 후 = 왼쪽 곱 × 오른쪽 곱 (최종 답)'
+        : 'temp: 내 왼쪽 숫자들의 곱을 저장 · 현재 숫자는 제외';
+    get('progress').textContent=`${position} / ${states.length-1}`;
+    get('back').disabled=position===0;
+    get('next').disabled=position===states.length-1;
+    get('play').disabled=position===states.length-1;
+    [...get('code').children].forEach((el,i)=>el.classList.toggle('pw-executed',i===s.line));
+    [...get('nums').children].forEach((el,i)=>{
+      el.className='pw-cell'+(s.i>=0?(i<s.i?' pw-left':i>s.i?' pw-right':' pw-current'):'');
+    });
+    [...get('temp').children].forEach((el,i)=>{
+      const val=i<s.temp.length?String(s.temp[i]):'—';
+      const differs=el.dataset.value!==val;
+      el.dataset.value=val;
+      const isAnswer=s.finished||(s.phase==='← 오른쪽 곱'&&s.i>=0&&(i>s.i||(i===s.i&&s.line>=8)));
+      el.className='pw-cell'+(isAnswer?' pw-answer':'')+(i===s.i?' pw-current':'');
+      const meaning = i >= s.temp.length ? '아직 저장 전' : isAnswer ? '최종 답' : '왼쪽 곱';
+      const number = document.createElement('span');
+      number.textContent = val;
+      const label = document.createElement('span');
+      label.className = 'pw-temp-label text-small';
+      label.textContent = meaning;
+      el.replaceChildren(number, label);
+      el.setAttribute('aria-label',`temp[${i}] = ${val} · ${meaning}`);
+      if(animate&&!reduced.matches&&(differs||i===s.changed))
+        el.animate([{transform:'translateY(-7px)'},{transform:'translateY(0)'}],{duration:420,easing:'ease-out'});
+    });
+    get('pointer').style.visibility=s.i<0?'hidden':'visible';
+    if(s.i>=0) get('pointer').style.left=(100*s.i/nums.length)+'%';
+    if(position===states.length-1) stop();
+  }
+  get('back').addEventListener('click',()=>{stop();if(position>0){position--;render();}});
+  get('next').addEventListener('click',()=>{stop();if(position<states.length-1){position++;render();}});
+  get('play').addEventListener('click',()=>{
+    if(timer!==null){stop();return;}
+    get('play').textContent='일시 정지';
+    timer=setInterval(()=>{if(position<states.length-1){position++;render();}else stop();},1700);
+  });
+  get('apply').addEventListener('click',()=>{
+    const parts=get('input').value.trim().split(/[\s,]+/);
+    const values=parts.map(Number);
+    if(parts.length<2||parts.length>6||!parts.every(x=>/^-?\d+$/.test(x))||!values.every(x=>Number.isInteger(x)&&x>=-9&&x<=9)) {
+      get('error').textContent='-9~9 사이 정수를 2~6개 입력해줘. 예: 1, 2, 3, 4';get('error').hidden=false;return;
+    }
+    stop();get('error').hidden=true;build(values);
+  });
+  get('input').addEventListener('keydown',e=>{if(e.key==='Enter')get('apply').click();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
+  build([1,2,3,4]);
+})();
+</script>
+
+</body>
+</html>
