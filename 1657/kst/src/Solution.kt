@@ -9,7 +9,7 @@ class Solution {
         val word2CharacterAndAppearancePair = countCharacters(word2)
 
         return checkCharacters(word1CharacterAndAppearancePair.keys, word2CharacterAndAppearancePair.keys)
-                && checkCharactersAppearance(word1CharacterAndAppearancePair.values.toList().sorted(), word2CharacterAndAppearancePair.values.toList().sorted())
+                && checkCharactersAppearance(word1CharacterAndAppearancePair.values.sorted(), word2CharacterAndAppearancePair.values.sorted())
     }
 
     private fun checkCharactersAppearance(counts: List<Int>, otherCounts: List<Int>): Boolean {
